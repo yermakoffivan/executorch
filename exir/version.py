@@ -29,7 +29,8 @@ MAX_EXECUTORCH_SCHEMA_VERSION = 1
 # Methods share a planned buffer (ExecutionPlan.shared_non_const_buffers).
 # Runtimes that ignore the field would run some of these programs wrongly: a
 # method that does not share the buffer but keeps host data of its own in the
-# bytes of the shared state would overwrite it. Shared host state that those
-# runtimes already share, with share_memory_arenas, stays at version 0, even
-# though those runtimes reset its initial data when a method loads late.
+# bytes of the shared state would overwrite it, and a method that shares it and
+# also has device memory would get a copy of its own. Shared host state that
+# those runtimes already share, with share_memory_arenas, stays at version 0,
+# even though those runtimes reset its initial data when a method loads late.
 SHARED_NON_CONST_BUFFERS_VERSION = 1
