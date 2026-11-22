@@ -4,6 +4,8 @@
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
 
+from typing import Collection
+
 import torch
 from executorch.exir.dialects._ops import ops as exir_ops
 from executorch.exir.pass_base import ExportPass
@@ -161,7 +163,9 @@ class QuantFusionPass(ExportPass):
         return PassResult(graph_module, True)
 
 
-def quant_fusion_and_const_prop_pass(program: ExportedProgram) -> ExportedProgram:
+def quant_fusion_and_const_prop_pass(
+    program: ExportedProgram, mutable_buffers: Collection[str] = ()
+) -> ExportedProgram:
     gm = program.graph_module
     node_value_dict = _get_node_value_dict(program)
     gm_res = QuantFusionPass(_fix_node_meta_val=True, node_value_dict=node_value_dict)(
@@ -170,5 +174,5 @@ def quant_fusion_and_const_prop_pass(program: ExportedProgram) -> ExportedProgra
     gm = gm_res.graph_module
 
     # Do const prop pass to remove packing/dtype conversion ops
-    program = constant_prop_pass(program)
+    program = constant_prop_pass(program, mutable_buffers=mutable_buffers)
     return program
